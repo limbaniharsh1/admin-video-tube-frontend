@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllVideo, uploadVideo } from "../../helpers/backend_helper";
+import { toastError } from "../../config/toastConfig";
 
 export const uploadVideoThunk = createAsyncThunk(
   "uploadVideoThunk",
@@ -9,7 +10,7 @@ export const uploadVideoThunk = createAsyncThunk(
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message;
-
+      toastError(errorMessage);
       // Reject with error response
       return rejectWithValue({
         status: error.response.status,
@@ -27,7 +28,7 @@ export const getAllVideoThunk = createAsyncThunk(
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message;
-
+      toastError(errorMessage);
       // Reject with error response
       return rejectWithValue({
         status: error.response.status,

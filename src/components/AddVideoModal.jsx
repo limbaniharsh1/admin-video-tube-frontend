@@ -16,6 +16,7 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
   const [videoUrl, setVideoUrl] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [tagInput, setTagInput] = useState("");
 
   const videoInputRef = useRef(null);
   const thumbnailInputRef = useRef(null);
@@ -69,9 +70,8 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
       formData.append("tags", JSON.stringify(values.tags)); // Important: convert arrays to JSON string
       const categoryIds = values.categories.map((cat) => cat.id);
       formData.append("categories", JSON.stringify(categoryIds));
-
       await dispatch(uploadVideoThunk(formData)).unwrap();
-      onClose();
+      // onClose();
 
       // onAdd({
       //   title: values.title,
@@ -129,6 +129,24 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
     onClose();
   }, [onClose]);
 
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const trimmed = tagInput.trim();
+      if (trimmed && !formik.values.tags.includes(trimmed)) {
+        formik.setFieldValue("tags", [...formik.values.tags, trimmed]);
+      }
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (indexToRemove) => {
+    formik.setFieldValue(
+      "tags",
+      formik.values.tags.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -145,50 +163,11 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
         </div>
 
         <form onSubmit={formik.handleSubmit} className="p-4 space-y-6">
-          {/* Video File */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Video File</label>
-            <div
-              onClick={() => videoInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-600 rounded-lg p-6 cursor-pointer hover:border-purple-500"
-            >
-              <input
-                type="file"
-                accept="video/*"
-                ref={videoInputRef}
-                className="hidden"
-                onChange={handleVideoChange}
-              />
-              {videoUrl ? (
-                <div>
-                  <video
-                    src={videoUrl}
-                    controls
-                    className="w-full h-40 rounded-lg"
-                  />
-                  <p className="text-sm text-center text-gray-400">
-                    {formik.values.video?.name}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center text-gray-400">
-                  <Film size={48} />
-                  <p>Click to upload video</p>
-                </div>
-              )}
-              {formik.errors.video && (
-                <p className="text-red-500 text-sm mt-1">
-                  {formik.errors.video}
-                </p>
-              )}
-            </div>
-          </div>
-
           {/* Title */}
           <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium">
+            {/* <label htmlFor="title" className="block text-sm font-medium">
               Title
-            </label>
+            </label> */}
             <input
               id="title"
               name="title"
@@ -203,40 +182,9 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
             )}
           </div>
 
-          {/* Thumbnail File */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Thumbnail (Optional)
-            </label>
-            <div
-              onClick={() => thumbnailInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-600 rounded-lg p-6 cursor-pointer hover:border-purple-500"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                ref={thumbnailInputRef}
-                className="hidden"
-                onChange={handleThumbnailChange}
-              />
-              {thumbnailUrl ? (
-                <img
-                  src={thumbnailUrl}
-                  alt="thumbnail"
-                  className="w-full h-40 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center text-gray-400">
-                  <Upload size={48} />
-                  <p>Click to upload thumbnail</p>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Categories */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Categories</label>
+            {/* <label className="block text-sm font-medium">Categories</label> */}
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
@@ -337,6 +285,120 @@ export default function AddVideoModal({ isOpen, onClose, onAdd }) {
                 {formik.errors.categories}
               </p>
             )}
+          </div>
+
+          <div className="flex gap-4">
+            {/* Video File */}
+            <div className="space-y-2 w-[50%]">
+              <label className="block text-sm font-medium">Video File</label>
+              <div
+                onClick={() => videoInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-600 rounded-lg p-6 cursor-pointer hover:border-purple-500"
+              >
+                <input
+                  type="file"
+                  accept="video/*"
+                  ref={videoInputRef}
+                  className="hidden"
+                  onChange={handleVideoChange}
+                />
+                {videoUrl ? (
+                  <div>
+                    <video
+                      src={videoUrl}
+                      controls
+                      className="w-full h-40 rounded-lg"
+                    />
+                    {/* <p className="text-sm text-center text-gray-400">
+                      {formik.values.video?.name}
+                    </p> */}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-gray-400">
+                    <Film size={48} />
+                    <p>Click to upload video</p>
+                  </div>
+                )}
+              </div>
+              {formik.errors.video && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formik.errors.video}
+                </p>
+              )}
+            </div>
+
+            {/* Thumbnail File */}
+            <div className="space-y-2 w-[50%]">
+              <label className="block text-sm font-medium">
+                Thumbnail (Optional)
+              </label>
+              <div
+                onClick={() => thumbnailInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-600 rounded-lg p-6 cursor-pointer hover:border-purple-500"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={thumbnailInputRef}
+                  className="hidden"
+                  onChange={handleThumbnailChange}
+                />
+                {thumbnailUrl ? (
+                  <img
+                    src={thumbnailUrl}
+                    alt="thumbnail"
+                    className="w-full h-40 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center text-gray-400">
+                    <Upload size={48} />
+                    <p>Click to upload thumbnail</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Tags Input */}
+          <div className="space-y-2">
+            {/* <label className="block text-sm font-medium">Tags</label> */}
+            <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-700 border border-gray-600 rounded-md min-h-[44px]">
+              {formik.values.tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-1 px-3 py-1 bg-purple-600 text-white rounded-full"
+                >
+                  <span>{tag}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(index)}
+                    className="hover:text-red-300"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder="Type and press Enter to add tags"
+                className="bg-transparent flex-1 min-w-[120px] outline-none text-white"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <textarea
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              placeholder="Enter video description"
+              name="description"
+              id="description"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md"
+            ></textarea>
           </div>
 
           {/* Buttons */}

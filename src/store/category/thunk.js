@@ -5,6 +5,7 @@ import {
   getAllCategory,
   updateCategory,
 } from "../../helpers/backend_helper";
+import { toastError } from "../../config/toastConfig";
 
 export const createCategoryThunk = createAsyncThunk(
   "createCategoryThunk",
@@ -32,7 +33,7 @@ export const updateCategoryThunk = createAsyncThunk(
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message;
-
+      toastError(errorMessage);
       // Reject with error response
       return rejectWithValue({
         status: error.response.status,
@@ -50,7 +51,7 @@ export const deleteCategoryThunk = createAsyncThunk(
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message;
-
+      toastError(errorMessage);
       // Reject with error response
       return rejectWithValue({
         status: error.response.status,
@@ -69,7 +70,7 @@ export const getAllCategoryThunk = createAsyncThunk(
       return data;
     } catch (error) {
       const errorMessage = error.response?.data?.message;
-
+      toastError(errorMessage);
       // Reject with error response
       return rejectWithValue({
         status: error.response.status,

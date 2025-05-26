@@ -11,7 +11,6 @@ import { routeConstants } from "../../constants/routes";
 
 export default function SignUp() {
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -61,7 +60,7 @@ export default function SignUp() {
             htmlFor="username"
             className="block text-sm font-medium text-gray-300"
           >
-            Username 
+            Username
           </label>
           <div className="mt-1">
             <input
@@ -74,7 +73,9 @@ export default function SignUp() {
               placeholder="you@example.com"
             />
             {formik.touched.username && formik.errors.username && (
-              <p className="text-red-400 text-xs mt-1">{formik.errors.username}</p>
+              <p className="text-red-400 text-xs mt-1">
+                {formik.errors.username}
+              </p>
             )}
           </div>
         </div>
@@ -158,10 +159,10 @@ export default function SignUp() {
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={formik.isSubmitting}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading ? "Creating account..." : "Create account"}
+            {formik.isSubmitting ? "Creating account..." : "Create account"}
           </button>
           <span className="ml-2 block text-sm  text-center mt-3 text-gray-300">
             Already have an account?{" "}

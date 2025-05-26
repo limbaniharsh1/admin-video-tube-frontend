@@ -11,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data } = useSelector((store) => store.Auth);
+  const { data, loading } = useSelector((store) => store.Auth);
 
   const formik = useFormik({
     initialValues: {
